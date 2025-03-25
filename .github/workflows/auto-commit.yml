@@ -2,9 +2,7 @@ name: Auto Commit Streak
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Runs every day at midnight UTC
-
-  workflow_dispatch:  # Allows manual trigger
+    - cron: '0 0 * * *'
 
 jobs:
   commit:
@@ -12,16 +10,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Set up Git
+      - name: Make changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Update streak file
-        run: |
-          echo "Last commit: $(date)" > streak.txt
+          echo "Auto commit to maintain streak [$(date)]" >> streak.txt
           git add streak.txt
           git commit -m "Auto commit to maintain streak [$(date)]"
-          git push
+
+      - name: Push changes
+        env:
+          ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+        run: |
+          git push https://x-access-token:${{ secrets.ACTIONS_TOKEN }}@github.com/${{ github.repository }}.git HEAD:master
